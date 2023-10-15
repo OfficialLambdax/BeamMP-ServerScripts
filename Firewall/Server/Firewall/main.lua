@@ -78,7 +78,7 @@ local function IsPlayerOldEnough(playerName)
 	end
 	
 	if not request.user or not request.user.created_at then -- fails..
-		print("FIREWALL Exception. Forum reponse does not contain the created_at value")
+		print("FIREWALL Exception. Forum response does not contain the created_at value")
 		return true
 	end
 	local birth = formatBackendDate(request.user.created_at)
