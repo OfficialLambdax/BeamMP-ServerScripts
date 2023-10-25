@@ -5,6 +5,8 @@
 	Simply because the ip-api or forum may be unavailable at times.
 ]]
 
+-- Add players you want this script to not handle
+-- format: {"player1","player2"}
 local EXCEPTIONS = {}
 
 -- Settings
@@ -17,7 +19,7 @@ local B_CHECK_IP <const> = false
 
 -- Will check the age of the account and kick them if its to young
 local B_CHECK_ACCOUNTAGE <const> = true
-local MIN_AGE_IN_MONTH <const> = 1 -- minimum account age in months
+local MIN_AGE_IN_DAYS <const> = 30 -- minimum account age in days
 
 local MSG_INVALID_IP <const> = "VPN's and Proxy's are not allowed on this Server." -- kick messages
 local MSG_INVALID_ACCOUNTAGE <const> = "Your Account is to fresh to join this Server."
@@ -26,7 +28,7 @@ local MSG_INVALID_ISGUEST <const> = 'You have to have a BeamMP account from "for
 
 -- Dont touch anything below this line ---------------------------------------
 
-local VERSION <const> = 0.13
+local VERSION <const> = 0.14
 local URL_PLAYER_JSON <const> = "https://forum.beammp.com/u/%.json"
 local URL_IP_DATA <const> = "http://ip-api.com/json/%?fields=status,message,proxy,hosting"
 local HTTP_EXEC = "" -- filled in init, as its dependant on the os the server is running on
@@ -83,11 +85,10 @@ local function IsPlayerOldEnough(playerName)
 		print("FIREWALL Exception. Forum reponse does not contain the created_at value")
 		return true
 	end
-	local birth = formatBackendDate(request.user.created_at)
-	local date = currentDate()
-	local month_dif = ((date.year - birth.year) * 12) + (date.month - birth.month)
 	
-	if month_dif >= MIN_AGE_IN_MONTH then return true end
+	local dif_days = math.floor(os.difftime(os.time(), os.time(formatBackendDate(request.user.created_at))) / (24 * 60 * 60))
+	
+	if dif_days >= MIN_AGE_IN_DAYS then return true end
 	return false
 end
 
@@ -160,7 +161,7 @@ function onInit()
 	print("Firewall: No Guests enabled? " .. tostring(B_NO_GUESTS))
 	print("Firewall: Check IP? " .. tostring(B_CHECK_IP))
 	print("Firewall: Check Account age? " .. tostring(B_CHECK_ACCOUNTAGE))
-	print("Firewall: Min Account age? " .. tostring(MIN_AGE_IN_MONTH) .. " months")
+	print("Firewall: Min Account age? " .. tostring(MIN_AGE_IN_DAYS) .. " days")
 	print("------- Firewall Loaded ---------")
 	
 	MP.SendChatMessage(-1, "Updated Firewall to v" .. VERSION)
