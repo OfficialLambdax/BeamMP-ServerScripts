@@ -11,26 +11,26 @@ local EXCEPTIONS = {}
 
 -- Settings
 -- if you want to allow guests on your server or not
-local B_NO_GUESTS <const> = true
+local B_NO_GUESTS = true
 
 -- Will check if the ip comes from a known vpn or proxy and kicks them if the case.
 -- A warning: There have been many adverts for VPN's over the past.. so you may be blocking away many players.
-local B_CHECK_IP <const> = false
+local B_CHECK_IP = false
 
 -- Will check the age of the account and kick them if its to young
-local B_CHECK_ACCOUNTAGE <const> = true
-local MIN_AGE_IN_DAYS <const> = 30 -- minimum account age in days
+local B_CHECK_ACCOUNTAGE = true
+local MIN_AGE_IN_DAYS = 30 -- minimum account age in days
 
-local MSG_INVALID_IP <const> = "VPN's and Proxy's are not allowed on this Server." -- kick messages
-local MSG_INVALID_ACCOUNTAGE <const> = "Your Account is to fresh to join this Server."
-local MSG_INVALID_ISGUEST <const> = 'You have to have a BeamMP account from "forum.beammp.com/login" to join this server'
+local MSG_INVALID_IP = "VPN's and Proxy's are not allowed on this Server." -- kick messages
+local MSG_INVALID_ACCOUNTAGE = "Your Account is to fresh to join this Server."
+local MSG_INVALID_ISGUEST = 'You have to have a BeamMP account from "forum.beammp.com/login" to join this server'
 
 
 -- Dont touch anything below this line ---------------------------------------
 
-local VERSION <const> = 0.14
-local URL_PLAYER_JSON <const> = "https://forum.beammp.com/u/%.json"
-local URL_IP_DATA <const> = "http://ip-api.com/json/%?fields=status,message,proxy,hosting"
+local VERSION = 0.15
+local URL_PLAYER_JSON = "https://forum.beammp.com/u/%.json"
+local URL_IP_DATA = "http://ip-api.com/json/%?fields=status,message,proxy,hosting"
 local HTTP_EXEC = "" -- filled in init, as its dependant on the os the server is running on
 
 -- Basic functions -----------------------------------------------------------
@@ -79,6 +79,10 @@ local function IsPlayerOldEnough(playerName)
 	if type(request) ~= "table" then  -- fails..
 		print("FIREWALL Exception. Cannot decode Forum response")
 		return true
+	end
+	
+	if request.profile_hidden == true then
+		return false
 	end
 	
 	if not request.user or not request.user.created_at then -- fails..
@@ -164,5 +168,5 @@ function onInit()
 	print("Firewall: Min Account age? " .. tostring(MIN_AGE_IN_DAYS) .. " days")
 	print("------- Firewall Loaded ---------")
 	
-	MP.SendChatMessage(-1, "Updated Firewall to v" .. VERSION)
+	--MP.SendChatMessage(-1, "Updated Firewall to v" .. VERSION)
 end

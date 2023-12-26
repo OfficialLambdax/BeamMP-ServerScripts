@@ -1,5 +1,5 @@
 -- Issues with this Script? Contact Neverless @ BeamMP
-local VERSION <const> = "0.2"
+local VERSION = "0.2"
 
 local ADMINS = {"Player1","Player2"} -- ADD YOUR PLAYERS THAT HAVE ACCESS TO THIS HERE
 local COMMANDS = {}

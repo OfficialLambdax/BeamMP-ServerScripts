@@ -1,7 +1,7 @@
 -- Issues with this Script? Contact Neverless @ BeamMP
-local VERSION <const> = "0.1"
+local VERSION = "0.1"
 
-local ADMINS = {"Player1","Player2"} -- DEFINES THE PLAYERS THAT HAVE ACCESS TO THIS SCRIPT HERE
+local ADMINS = {"Player1","Player2"} -- ADD YOUR PLAYERS THAT HAVE ACCESS TO THIS HERE
 local WHITELIST = {}
 local COMMANDS = {}
 local ENABLED = false -- set to true to enable it by default
