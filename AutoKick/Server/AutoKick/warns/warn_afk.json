@@ -1,0 +1,5 @@
+{
+    "buttonText": "understood",
+    "description": "[img]/art/image/afk.jpg[/img]\nIf you just go AFK on a server then you don’t just\n- take away a player slot,\n- but your car also takes away performance.\n\nAnother player may like to play on this Server. If you continue to be AFK, you will be kicked.\n\nOr type \"/notafk\" in chat",
+    "name": "You appear to be AFK"
+}
