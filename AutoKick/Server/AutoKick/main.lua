@@ -6,6 +6,7 @@
 ]]
 
 -- Admins arent tracked, warned or kicked. And they can temporarely disable the script by sending "/autokick disable" into the chat, AutoKick will be disabled for 60 minutes.
+-- format {"PlayerName1", "PlayerName2"}
 local ADMINS = {}
 
 -- settings
@@ -51,7 +52,7 @@ local MSG_SPAWN_UNICYCLE_KICK = "AutoKick: Why would you constantly spawn player
 local MSG_AFK_KICK_BROADCAST = 'AutoKick: "%" appears to have gone afk'
 local MSG_EDIT_KICK_BROADCAST = 'AutoKick: "%". Causes to many Ques'
 local MSG_SPAWN_KICK_BROADCAST = 'AutoKick: "%". Causes to many Ques'
-local MSG_SPAWN_UNICYCLE_BROADCAST = 'AutoKick: "%". Constantly spawned Snowmans'
+local MSG_SPAWN_UNICYCLE_BROADCAST = 'AutoKick: "%". Constantly spawned player models'
 
 -- NO NEED TO EDIT ANY OF THE BELOW VARIABLES
 -- ----------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ local WARNING_MSG_HELPER = {
 
 -- NO EDITING BELOW THIS LINE --------------------------------------------
 
-local VERSION = 0.26
+local VERSION = 0.27
 
 -- required to encode the warn messages
 local BASE64 = require("libs/base64")
@@ -274,6 +275,7 @@ local function warnPlayer(playerId, reason)
 		return nil
 	end
 	
+	if msg == nil then return nil end -- error was already printed in getWarnFile()
 	MP.TriggerClientEvent(playerId, "autokick_warning", msg)
 end
 
@@ -470,6 +472,14 @@ function onVehicleEdited(playerId, vehicleId, vehicleData)
 	
 	local vehicleData = vehicleDataTrim(vehicleData)
 	local diff = Util.JsonDiff(PLAYERS[playerId].vehicles[vehicleId].config, vehicleData)
+	-- if error. even if there is no diff the return is 2 chars long "[]"
+	-- but if corrupted json, the return is just a empty string.
+	if diff:len() == 0 then
+		print("AutoKick Error: Cannot decode VehicleData in onVehicleEdited for player " .. MP.GetPlayerName(playerId) .. ". Deleting vehicle")
+		MP.RemoveVehicle(playerId, vehicleId)
+		MP.SendChatMessage(playerId, "AutoKick: Your vehicle data is corrupted. Removed vehicle. You may want to approach the admin of this Server is this persists.")
+		return nil
+	end
 	local diff = Util.JsonDecode(diff)
 	local jbmChanged = false
 	for index, _ in pairs(diff) do
@@ -513,8 +523,11 @@ function onVehicleSpawn(playerId, vehicleId, vehicleData)
 	
 	local vehicleTable = Util.JsonDecode(PLAYERS[playerId].vehicles[vehicleId].config)
 	if type(vehicleTable) ~= "table" then
-		print("Cannot decode VehicleData in onVehicleSpawn")
-		return nil
+		print("AutoKick Error: Cannot decode VehicleData in onVehicleSpawn for player " .. MP.GetPlayerName(playerId) .. ". Denying spawn")
+		
+		PLAYERS[playerId].vehicles[vehicleId] = nil
+		MP.SendChatMessage(playerId, "AutoKick: Your vehicle data is corrupted. Denied vehicle spawn. You may want to approach the admin of this Server if this persists.")
+		return 1 -- denying spawn, smt is messed up with the vehicle json
 	end
 	
 	if MP.GetPlayerCount() < MIN_PLAYERS_UNTIL_ACTIVE then return nil end
@@ -573,6 +586,8 @@ local function onHotreload() -- script is hotreload save, because of this func
 end
 
 function onInit()
+	print("======== Loading AutoKick =======")
+	print("---------.Version " .. VERSION .. ".----------")
 	OUR_SCRIPT_PATH = scriptPath()
 	
 	if WARNING_MSG_HELPER_TEST then
@@ -587,7 +602,7 @@ function onInit()
 	if getWarnFile(WARN_SPAWN_FILE) == nil then error = true end
 	if getWarnFile(WARN_SPAWN_UNICYCLE_FILE) == nil then error = true end
 	if error then
-		print("AutoKick Error: One or multiple Warning files are missing. Aborting load. Script wont function.")
+		print("AutoKick Error: ABORTING LOAD. One or multiple Warning files are missing. Script wont function.")
 		return nil
 	end
 	
@@ -623,7 +638,6 @@ function onInit()
 	MP.CreateEventTimer("AutoKick_tempbantick", 60000)
 	
 	onHotreload()
-	print("======== Loading AutoKick =======")
 	print("----------. Condition .----------")
 	if AFK_KICK_ONLY_IF_SERVERFULL then
 		print("- Kicking AFK players only when")
