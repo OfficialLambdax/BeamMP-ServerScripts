@@ -1,7 +1,7 @@
 
 -- CONSTANTS -----------------------------------------------------------------
-local MAXTIME <const> = 30
-local DEFAULTTIME <const> = 10
+local MAXTIME = 30
+local DEFAULTTIME = 10
 
 -- GLOBALS -------------------------------------------------------------------
 local LEFTTIME = 0
