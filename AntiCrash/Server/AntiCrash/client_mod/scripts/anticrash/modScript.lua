@@ -1,0 +1,1 @@
+setExtensionUnloadMode("anticrash", "manual")
