@@ -49,7 +49,6 @@ end
 
 function TriggerClientEvent:set_synced(player_id)
 	self.players[player_id] = true
-	print(MP.GetPlayerName(player_id) .. " is considered synced now")
 end
 
 function TriggerClientEvent:remove(player_id)
