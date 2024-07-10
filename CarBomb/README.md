@@ -3,6 +3,10 @@
 ### Motivation
 Eh. Felt like it.
 
+### What does it do?
+Installs a auto bomb inside everyones car that is enabled whenever the player drives over X speed.
+And that explodes the vehicle once the player drives below the same speed for > 3 seconds.
+
 ### Usage
 - Type these either into the ingame chat or into the server console
 - `/bomb` and `/bomb help` will show all available commands
