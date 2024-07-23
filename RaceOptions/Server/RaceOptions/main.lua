@@ -144,14 +144,6 @@ function onPlayerDisconnect(player_id)
 	TriggerClientEvent:remove(player_id)
 end
 
-function onExplosion(player_id, vehicle_id)
-	vehicle_id = tonumber(vehicle_id)
-	if vehicle_id == nil then return nil end
-	if MP.GetPlayerVehicles(player_id)[vehicle_id] == nil then return nil end
-	
-	TriggerClientEvent:broadcastExcept(player_id, "carbomb_explode", tostring(player_id) .. "-" .. tostring(vehicle_id))
-end
-
 ---------------------------------------------------------------------------------------------
 -- Init
 function onInit()
@@ -160,8 +152,6 @@ function onInit()
 		copy[player_name] = true
 	end
 	M.Admins = copy
-	
-	MP.RegisterEvent("carbomb_exploded", "onExplosion")
 
 	MP.RegisterEvent("onChatMessage", "onChatMessage")
 	MP.RegisterEvent("onConsoleInput", "onConsoleInput")
