@@ -1,11 +1,10 @@
 -- Made by Neverless @ BeamMP. Issues? Feel free to ask.
-local VERSION = "0.1" -- 10.07.2024 (DD.MM.YYYY)
+local VERSION = "0.1" -- 23.07.2024 (DD.MM.YYYY)
 
 local M = {}
 M.Admins = {"player_1", "player_2"}
 M.Commands = {}
 M.IsEnabled = false
-M.SpeedKph = 40
 
 ---------------------------------------------------------------------------------------------
 -- Basics
@@ -104,11 +103,11 @@ function onConsoleInput(cmd)
 	onChatMessage(-2, "", cmd, true)
 end
 
--- /bomb command
+-- /rcopt command
 -- or
--- /bomb command player_id
+-- /rcopt command player_id
 function onChatMessage(player_id, player_name, message, is_console)
-	if message:sub(1, 5) ~= "/bomb" then return nil end
+	if message:sub(1, 6) ~= "/rcopt" then return nil end
 	if not M.Admins[player_name] and is_console ~= true then return 1 end
 	local message = messageSplit(message)
 	if tableSize(message) < 2 then message[1] = "help" end
@@ -135,11 +134,10 @@ function onPlayerJoin(player_id)
 	TriggerClientEvent:set_synced(player_id)
 	
 	if M.IsEnabled then
-		TriggerClientEvent:send(player_id, "carbomb_enable")
+		TriggerClientEvent:send(player_id, "raceoptions_enablecompetitivemode")
 	else
-		TriggerClientEvent:send(player_id, "carbomb_disable")
+		TriggerClientEvent:send(player_id, "raceoptions_disablecompetitivemode")
 	end
-	TriggerClientEvent:send(player_id, "carbomb_setspeed", M.SpeedKph)
 end
 
 function onPlayerDisconnect(player_id)
@@ -174,10 +172,7 @@ function onInit()
 	for player_id, _ in pairs(MP.GetPlayers()) do
 		onPlayerJoin(player_id)
 	end
-	
-	print("-------. CarBomb loaded .-------")
-	
-	--onChatMessage(-1, "Neverless", "/troll honk")
+	print("-----. RaceOptions loaded .-----")
 end
 
 
@@ -185,13 +180,9 @@ end
 -- Commands
 M.Commands.enable = function(data)
 	M.IsEnabled = true
-	TriggerClientEvent:send(data.to_playerid, "carbomb_enable")
+	TriggerClientEvent:send(data.to_playerid, "raceoptions_enablecompetitivemode")
 end
 M.Commands.disable = function(data)
 	M.IsEnabled = false
-	TriggerClientEvent:send(data.to_playerid, "carbomb_disable")
-end
-M.Commands.setspeed = function(data) -- /bomb setspeed -1 40
-	M.SpeedKph = tonumber(data.message[3]) or 40
-	TriggerClientEvent:send(data.to_playerid, "carbomb_setspeed", tonumber(data.message[3]) or 40)
+	TriggerClientEvent:send(data.to_playerid, "raceoptions_disablecompetitivemode")
 end
