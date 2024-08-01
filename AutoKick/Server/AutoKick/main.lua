@@ -88,7 +88,7 @@ local WARNING_MSG_HELPER = {
 
 -- NO EDITING BELOW THIS LINE --------------------------------------------
 
-local VERSION = 0.27
+local VERSION = 0.28
 
 -- required to encode the warn messages
 local BASE64 = require("libs/base64")
@@ -563,6 +563,7 @@ function onChatMessage(playerId, playerName, message)
 		local diff_minutes = math.floor(os.difftime(os.time(), PLAYERS[playerId].afk_since) / 60)
 		if diff_minutes >= WARN_AFK_TIME then
 			PLAYERS[playerId].afk_since = -1
+			PLAYERS[playerId].warns.afk = false
 			MP.SendChatMessage(playerId, "AFK status reset")
 		end
 		return 1
