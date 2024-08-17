@@ -33,7 +33,7 @@ There is only a single Environment Sync script openly available and it comes bun
 - There are various settings you can set on the top of this file
 
 <p align="center">
-    <img src=".art/envsync.jpg" width="292" />
+    <img src="/.art/envsync.jpg" width="292" />
 </p>
 
 ### Behind the Scenes
