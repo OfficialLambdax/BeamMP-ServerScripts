@@ -1,5 +1,5 @@
 -- Made by Neverless @ BeamMP. Issues? Feel free to ask.
-local VERSION = "0.1" -- 17.08.2024 (DD.MM.YYYY)
+local VERSION = "0.2" -- 18.08.2024 (DD.MM.YYYY)
 
 --[[ Todo
 	- Make the game tick time faster/slower if close to the destination instead of setting it and if game is not paused
@@ -259,7 +259,7 @@ function M.Players:new(player_id)
 			dayScale = 0,
 			nightScale = 0,
 			time = 0,
-			gravity = 0,
+			gravity = -9.8100004196167,
 			startTime = 0,
 			temperatureC = 0,
 			fogDensity = 0,
