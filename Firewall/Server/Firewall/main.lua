@@ -5,9 +5,13 @@
 	Simply because the ip-api or forum may be unavailable at times.
 ]]
 
--- Add players you want this script to not handle
+-- Add hardcoded players you want this script to not handle
 -- format: {"player1","player2"}
 local EXCEPTIONS = {}
+
+-- Add dynamic players. Reloaded on each new onPlayerAuth
+-- format: {"players":["player1","player2"]}
+local EXCEPTIONS_FILE = "Resources/Server/Firewall/data/exceptions.json"
 
 -- Settings
 -- if you want to allow guests on your server or not
@@ -28,7 +32,7 @@ local MSG_INVALID_ISGUEST = 'You have to have a BeamMP account from "forum.beamm
 
 -- Dont touch anything below this line ---------------------------------------
 
-local VERSION = 0.15
+local VERSION = 0.16
 local URL_PLAYER_JSON = "https://forum.beammp.com/u/%.json"
 local URL_IP_DATA = "http://ip-api.com/json/%?fields=status,message,proxy,hosting"
 local HTTP_EXEC = "" -- filled in init, as its dependant on the os the server is running on
@@ -116,6 +120,16 @@ end
 
 -- Events --------------------------------------------------------------------
 function onPlayerAuth(playerName, playerRole, isGuest, player)
+	local handle = io.open(EXCEPTIONS_FILE, "r")
+	if handle ~= nil then
+		local file_exceptions = Util.JsonDecode(handle:read("*all"))
+		handle:close()
+		if file_exceptions ~= nil then
+			for i in pairs(file_exceptions.players) do
+				if file_exceptions.players[i] == playerName then return nil end
+			end
+		end
+	end
 	if EXCEPTIONS[playerName] then return nil end
 	if isGuest and B_NO_GUESTS then
 		print('FIREWALL "' .. playerName .. '" no guests allowed')
@@ -169,4 +183,5 @@ function onInit()
 	print("------- Firewall Loaded ---------")
 	
 	--MP.SendChatMessage(-1, "Updated Firewall to v" .. VERSION)
+	--onPlayerAuth("Neverless", "USER", false, {})
 end
