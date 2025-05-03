@@ -2,7 +2,7 @@
 local VERSION = "0.1" -- 23.07.2024 (DD.MM.YYYY)
 
 local M = {}
-M.Admins = {"player_1", "player_2"}
+M.Admins = {"player 1", "player 2"}
 M.Commands = {}
 M.IsEnabled = false
 
@@ -172,7 +172,12 @@ M.Commands.enable = function(data)
 	M.IsEnabled = true
 	TriggerClientEvent:send(data.to_playerid, "raceoptions_enablecompetitivemode")
 end
+
 M.Commands.disable = function(data)
 	M.IsEnabled = false
 	TriggerClientEvent:send(data.to_playerid, "raceoptions_disablecompetitivemode")
+end
+
+M.Commands.reset = function(data)
+	TriggerClientEvent:send(data.to_playerid, "raceoptions_resetAllOwnedVehicles")
 end

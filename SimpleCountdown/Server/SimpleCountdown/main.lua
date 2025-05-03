@@ -1,6 +1,9 @@
 
+local Colors = require("libs/colors")
+local SendChatMessage = Colors.SendChatMessage
+
 -- CONSTANTS -----------------------------------------------------------------
-local MAXTIME = 30
+local MAXTIME = 60
 local DEFAULTTIME = 10
 
 -- GLOBALS -------------------------------------------------------------------
@@ -25,24 +28,30 @@ function onChatMessage(playerId, playerName, message)
 	if #message == 0 then
 		message[1] = DEFAULTTIME
 	elseif tonumber(message[1]) > MAXTIME then
-		MP.SendChatMessage(playerId, "=> Max time is " .. tostring(MAXTIME))
+		SendChatMessage(playerId, "^l^c->^r^l Max time is " .. tostring(MAXTIME))
 		return 1
 	end
 	
 	LEFTTIME = tonumber(message[1])
 	MP.CreateEventTimer("countdown_loop", 1000)
-	MP.SendChatMessage(-1, "=> " .. message[1] .. " Second countdown started by " .. playerName)
+	SendChatMessage(-1, "^l->^6^r^l " .. message[1] .. " Second countdown started by ^b@" .. playerName)
 	return 1
 end
 
 function countdown()
 	LEFTTIME = LEFTTIME - 1
 	if LEFTTIME <= 0 then
-		MP.SendChatMessage(-1, "=> GO !!")
+		SendChatMessage(-1, "^l^a-> GO GO GO !!")
 		MP.CancelEventTimer("countdown_loop")
 		return nil
 	end
-	MP.SendChatMessage(-1, "=> " .. LEFTTIME)
+	if LEFTTIME <= 2 then
+		SendChatMessage(-1, "^l^e-> " .. LEFTTIME)
+	elseif LEFTTIME <= 4 then
+		SendChatMessage(-1, "^l^6-> " .. LEFTTIME)
+	elseif LEFTTIME > 4 then
+		SendChatMessage(-1, "^l^c-> " .. LEFTTIME)
+	end
 end
 
 function onInit()
