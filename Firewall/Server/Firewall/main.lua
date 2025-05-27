@@ -26,13 +26,14 @@ local B_CHECK_ACCOUNTAGE = true
 local MIN_AGE_IN_DAYS = 30 -- minimum account age in days
 
 local MSG_INVALID_IP = "VPN's and Proxy's are not allowed on this Server." -- kick messages
+local MSG_PROFILE_HIDDEN = "To play on this server your BeamMP profile must NOT be hidden. This is required to check your account age."
 local MSG_INVALID_ACCOUNTAGE = "Your Account is to fresh to join this Server."
 local MSG_INVALID_ISGUEST = 'You have to have a BeamMP account from "forum.beammp.com/login" to join this server'
 
 
 -- Dont touch anything below this line ---------------------------------------
 
-local VERSION = 0.16
+local VERSION = 0.17
 local URL_PLAYER_JSON = "https://forum.beammp.com/u/%.json"
 local URL_IP_DATA = "http://ip-api.com/json/%?fields=status,message,proxy,hosting"
 local HTTP_EXEC = "" -- filled in init, as its dependant on the os the server is running on
@@ -85,19 +86,24 @@ local function IsPlayerOldEnough(playerName)
 		return true
 	end
 	
-	if request.profile_hidden == true then
-		return false
+	if not request.user then
+		print("FIREWALL Exception. Forum reponse does not contain the user value")
+		return true
 	end
 	
-	if not request.user or not request.user.created_at then -- fails..
-		print("FIREWALL Exception. Forum reponse does not contain the created_at value")
+	if request.user.profile_hidden == true then
+		return false, MSG_PROFILE_HIDDEN
+	end
+	
+	if not request.user.created_at then -- fails..
+		print("FIREWALL Exception. Forum reponse does not contain the user.created_at value")
 		return true
 	end
 	
 	local dif_days = math.floor(os.difftime(os.time(), os.time(formatBackendDate(request.user.created_at))) / (24 * 60 * 60))
 	
 	if dif_days >= MIN_AGE_IN_DAYS then return true end
-	return false
+	return false, MSG_INVALID_ACCOUNTAGE
 end
 
 local function IsValidIP(IP)
@@ -136,18 +142,17 @@ function onPlayerAuth(playerName, playerRole, isGuest, player)
 		return MSG_INVALID_ISGUEST
 	end
 	
-	if type(player) == "table" then
-		if B_CHECK_IP then
-			if not IsValidIP(player.ip) then
-				print('FIREWALL "' .. playerName .. '" joins with invalid ip "' .. player.ip .. '"')
-				return MSG_INVALID_IP
-			end
+	if type(player) == "table" and B_CHECK_IP then
+		if not IsValidIP(player.ip) then
+			print('FIREWALL "' .. playerName .. '" joins with invalid ip "' .. player.ip .. '"')
+			return MSG_INVALID_IP
 		end
 	end
 	if B_CHECK_ACCOUNTAGE and not isGuest then
-		if not IsPlayerOldEnough(string.lower(playerName)) then
-			print('FIREWALL "' .. playerName .. '" account is not old enough')
-			return MSG_INVALID_ACCOUNTAGE
+		local isOldEnough, invalidReason = IsPlayerOldEnough(playerName:lower())
+		if not isOldEnough then
+			print('FIREWALL "' .. playerName .. '" ' .. invalidReason)
+			return invalidReason
 		end
 	end
 end

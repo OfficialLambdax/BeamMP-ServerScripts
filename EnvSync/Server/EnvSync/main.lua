@@ -1,9 +1,34 @@
 -- Made by Neverless @ BeamMP. Issues? Feel free to ask.
-local VERSION = "0.2" -- 18.08.2024 (DD.MM.YYYY)
+local VERSION = "0.3" -- 27.05.2025 (DD.MM.YYYY)
 
 --[[ Todo
 	- Make the game tick time faster/slower if close to the destination instead of setting it and if game is not paused
 	- Hard lock the gravity setting in the client
+	- Integrate Admins, that have full power over env and where any change they do to env, immediatly overwrites the servers env
+	- Integrate temp sync
+		Notes _
+		- Temp is regulated in core_environment.onUpdate() from a temp_curve set to a theLevelInfo object.
+		scenetree.theLevelinfo:setTemperatureCurveC(temp_curve)
+		core_environment.onInit() -- recreate tempcurve cache
+		dump(scenetree.theLevelinfo:getTemperatureCurveC())
+		temp_curve Format
+			[1..n] = table (where n must atleast be 2)
+				[1] = float (0 - 1, represents time, see below)
+				[2] = float (as temperature in celcisus)
+				
+			--0-------0.5-------1--
+			12:00----24:00----12:00
+			
+			eg.
+			[1] = [ 0  , 20 ]
+			[2] = [ 0.5, 10 ]
+			[3] = [ 1  , 20 ]
+			
+			At 12:00 temp will be 20°C
+			At 18:00 temp will be 15°C
+			At 24:00 temp will be 10°C
+			At 06:00 temp will be 15°C
+			At 12:00 temp will be 20°C
 ]]
 
 local M = {}
@@ -189,7 +214,7 @@ function TriggerClientEvent:send(player_id, event_name, event_data)
 	end
 	for _, player_id in pairs(send_to) do
 		if not self:is_synced(player_id) then
-			print(MP.GetPlayerName(player_id) .. " is not ready yet to receive event data")
+			--print(MP.GetPlayerName(player_id) .. " is not ready yet to receive event data")
 		else
 			if type(event_data) == "table" then event_data = Util.JsonEncode(event_data) end
 			MP.TriggerClientEvent(player_id, event_name, tostring(event_data) or "")
@@ -198,6 +223,7 @@ function TriggerClientEvent:send(player_id, event_name, event_data)
 end
 
 function TriggerClientEvent:broadcastExcept(player_id, event_name, event_data)
+	player_id = tonumber(player_id)
 	for player_id_2, _ in pairs(MP.GetPlayers()) do
 		if player_id ~= player_id_2 then
 			if not self:is_synced(player_id_2) then
@@ -423,7 +449,7 @@ M.ServerTime = { -- commented are unsupported as of now
 
 local function setPreset(table)
 	for k, v in pairs(table) do
-		if M.preset[k] and type(M.preset[k]) == type(v) then
+		if type(M.ServerTime[k]) == type(v) then
 			M.preset[k] = v
 		end
 	end
@@ -431,7 +457,7 @@ end
 
 local function adaptPreset()
 	for k, v in pairs(M.preset) do
-		if M.ServerTime[k] and type(M.ServerTime[k]) == type(v) then
+		if type(M.ServerTime[k]) == type(v) then
 			M.ServerTime[k] = v
 		end
 	end
@@ -494,7 +520,6 @@ function timeTick()
 			time_increase = (dt / 1000) * (M.TimeMovePerSecond * M.ServerTime.dayScale)
 		end
 		M.ServerTime.time = M.ServerTime.time + time_increase
-		--if M.ServerTime.time > 1 then M.ServerTime.time = M.ServerTime.time - 1 end
 		while M.ServerTime.time > 1 do
 			M.ServerTime.time = M.ServerTime.time - 1
 		end
