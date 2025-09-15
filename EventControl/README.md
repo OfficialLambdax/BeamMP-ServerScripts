@@ -26,11 +26,11 @@ This brings moderational needs of large scale events to almost zero. You as the 
 	
 > Now 15 Players can join. After they have successfully downloaded the mods and fully joined, a timer starts running. After SETTINGS.overplayed_after minutes this player is considered to have played enough to not be able to join again. They are not kicked automatically. But if they try to rejoin this or another server the script will not allow them to rejoin.
 > 
-> You Essentially open your Servers and eg set a limit of 15 players. After you as the event host decide that these 15 players have qualified enough you just `/event kickall` which will kick everyone but the adminds and this way allow other 15 players join and qualify. Rinse and repeat.
+> You Essentially open your Servers and eg set a limit of 15 players. After you as the event host decide that these 15 players have qualified enough you just `/event kickall` which will kick everyone but the admins and this way allow other 15 players to join and qualify. Rinse and repeat.
 
 Commands
 - /event setlimit 15 - will allow 15 players (wont affect admins and admins arent counted)
-- /event kickall - kicks everyone that is not a admin, this way allowing x many more players do join that havent yet qualied
+- /event kickall - kicks everyone that is not a admin, this way allowing x many more players do join that havent yet qualified
 - /event reset - will reset the database
 
 ### Racing
