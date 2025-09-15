@@ -1,1 +1,0 @@
-setExtensionUnloadMode("anticrash", "manual")
