@@ -1,6 +1,6 @@
 # VehicleConfigCheck (WIP)
 
-Performs a server side vehicle config check and automatically removes vehicles that dont pass it. That way this script can automatically remove player owned vehicles that contain parts not allowed on the server.
+Performs a server side vehicle config check and automatically removes vehicles that dont pass it. That way this script can automatically remove player owned vehicles that contain parts not allowed on the server. Also contains optional support for the [ChatHook](https://github.com/OfficialLambdax/BeamMP-ChatHook) to post its actions to your discord.
 
 
 ### Functionality
