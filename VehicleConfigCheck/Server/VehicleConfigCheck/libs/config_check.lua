@@ -35,7 +35,7 @@ M.learnParts = function()
 end
 
 M.isValidJbm = function(jbm)
-	return M.all_parts.jbeams[jbm] ~= nil
+	return M.all_parts.jbeams[jbm:lower()] ~= nil
 end
 
 M.checkConfig = function(jbm, parts)
