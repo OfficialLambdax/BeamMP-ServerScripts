@@ -1,5 +1,7 @@
 # RaceOptions
 
+## There have been reports that this is broken
+
 ### Motivation
 Quickly made on request
 
