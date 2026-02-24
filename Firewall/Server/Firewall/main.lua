@@ -33,7 +33,7 @@ local MSG_INVALID_ISGUEST = 'You have to have a BeamMP account from "forum.beamm
 
 -- Dont touch anything below this line ---------------------------------------
 
-local VERSION = 0.17
+local VERSION = 0.18
 local URL_PLAYER_JSON = "https://forum.beammp.com/u/%.json"
 local URL_IP_DATA = "http://ip-api.com/json/%?fields=status,message,proxy,hosting"
 local HTTP_EXEC = "" -- filled in init, as its dependant on the os the server is running on
@@ -83,27 +83,30 @@ local function IsPlayerOldEnough(playerName)
 	local request = Util.JsonDecode(request)
 	if type(request) ~= "table" then  -- fails..
 		print("FIREWALL Exception. Cannot decode Forum response")
+		MP.TriggerGlobalEvent("onScriptMessage", "Exception. Cannot decode forum response", "Firewall")
 		return true
 	end
 	
 	if not request.user then
 		print("FIREWALL Exception. Forum reponse does not contain the user value")
+		MP.TriggerGlobalEvent("onScriptMessage", "Exception. Forum response does not contain .user", "Firewall")
 		return true
 	end
 	
 	if request.user.profile_hidden == true then
-		return false, MSG_PROFILE_HIDDEN
+		return false, 1
 	end
 	
 	if not request.user.created_at then -- fails..
 		print("FIREWALL Exception. Forum reponse does not contain the user.created_at value")
+		MP.TriggerGlobalEvent("onScriptMessage", "Exception. Forum response does not contain .user.created_at", "Firewall")
 		return true
 	end
 	
 	local dif_days = math.floor(os.difftime(os.time(), os.time(formatBackendDate(request.user.created_at))) / (24 * 60 * 60))
 	
 	if dif_days >= MIN_AGE_IN_DAYS then return true end
-	return false, MSG_INVALID_ACCOUNTAGE
+	return false, 2
 end
 
 local function IsValidIP(IP)
@@ -112,10 +115,12 @@ local function IsValidIP(IP)
 	local request = Util.JsonDecode(request)
 	if type(request) ~= "table" then
 		print("FIREWALL Exception. IP-API response cannot be decoded")
+		MP.TriggerGlobalEvent("onScriptMessage", "Exception. Ip api response is invalid", "Firewall")
 		return true
 	end
 	if request.status == "fail" then -- fails, but we let the player in
 		print("FIREWALL Exception. IP-API fails to parse our request")
+		MP.TriggerGlobalEvent("onScriptMessage", "Exception. Ip api backend unable to process our request", "Firewall")
 		print('REASON "' .. IP .. '" is "' .. request.message .. '"')
 		return true
 	end
@@ -139,20 +144,29 @@ function onPlayerAuth(playerName, playerRole, isGuest, player)
 	if EXCEPTIONS[playerName] then return nil end
 	if isGuest and B_NO_GUESTS then
 		print('FIREWALL "' .. playerName .. '" no guests allowed')
+		MP.TriggerGlobalEvent("onScriptMessage", "Guest player was kicked", "Firewall")
 		return MSG_INVALID_ISGUEST
 	end
 	
 	if type(player) == "table" and B_CHECK_IP then
 		if not IsValidIP(player.ip) then
 			print('FIREWALL "' .. playerName .. '" joins with invalid ip "' .. player.ip .. '"')
+			MP.TriggerGlobalEvent("onScriptMessage", "Player using a VPN was kicked", "Firewall")
 			return MSG_INVALID_IP
 		end
 	end
 	if B_CHECK_ACCOUNTAGE and not isGuest then
 		local isOldEnough, invalidReason = IsPlayerOldEnough(playerName:lower())
 		if not isOldEnough then
-			print('FIREWALL "' .. playerName .. '" ' .. invalidReason)
-			return invalidReason
+			if invalidReason == 1 then
+				print('FIREWALL "' .. playerName .. '" ' .. MSG_PROFILE_HIDDEN)
+				MP.TriggerGlobalEvent("onScriptMessage", "Kickd player. Cannot verify account age. Profile is hidden.", "Firewall")
+				return MSG_PROFILE_HIDDEN
+			elseif invalidReason == 2 then
+				print('FIREWALL "' .. playerName .. '" ' .. MSG_INVALID_ACCOUNTAGE)
+				MP.TriggerGlobalEvent("onScriptMessage", "Kicked Player. Account is to young.", "Firewall")
+				return MSG_INVALID_ACCOUNTAGE
+			end
 		end
 	end
 end
