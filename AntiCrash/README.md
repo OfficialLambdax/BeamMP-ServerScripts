@@ -13,6 +13,3 @@ Changing `TIME_UNTIL_KICK` to a lower number makes the script even less player f
 
 ## Feedback
 I got feedback from Ashmaker000 telling me that a number of 20 seconds in `TIME_UNTIL_KICK` also gives solid results
-
-## WIP
-Unlike my other scripts, this one yet has to undergo long term testing to fine tune the numbers and to perhaps introduce better ways of detecting it.
