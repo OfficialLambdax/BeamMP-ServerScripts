@@ -180,7 +180,8 @@ function onInit()
 	end
 	
 	-- check
-	local request = httpRequest(string.gsub(URL_PLAYER_JSON, "%%", "Neverless"))
+	--local request = httpRequest(string.gsub(URL_PLAYER_JSON, "%%", "Neverless"))
+	local request = httpRequest(string.gsub(URL_IP_DATA, "%%", "127.0.0.1"))
 	if type(request) == "nil" then
 		print('FIREWALL. Exception. cannot execute line "' .. HTTP_EXEC .. '"')
 		print('FIREWALL ABORTED LOADING')
